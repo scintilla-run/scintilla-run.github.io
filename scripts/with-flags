@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+set -euo pipefail
+root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+bin="${FLAGS2ENV_BIN:-$root/tools/flags-2-env/build/flags2env}"
+if [[ ! -x "$bin" ]]; then make -C "$root/tools/flags-2-env" all >&2; fi
+exports="$("$bin" shell-env --config "$root/.cli-flags.toml" -- "$@")"
+eval "$exports"
+exec npm --prefix "$root" run dev -- --host "${HOST}" --port "${PORT}"

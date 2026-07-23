@@ -11,7 +11,7 @@
     "test:puppeteer": "node --test \"tests/puppeteer/*.test.mjs\""
   },
   "dependencies": {
-    "astro": "^5.12.0"
+    "astro": "^7.1.3"
   },
   "devDependencies": {
     "@playwright/test": "^1.60.0",

@@ -1,0 +1,18 @@
+[help]
+url = "https://github.com/ORESoftware/flags-2-env"
+
+[parse]
+allow_unknown = false
+
+[flags.host]
+env = "HOST"
+aliases = ["host"]
+type = "string"
+default = "127.0.0.1"
+
+[flags.port]
+env = "PORT"
+aliases = ["port"]
+short = "p"
+type = "integer"
+default = 4321
