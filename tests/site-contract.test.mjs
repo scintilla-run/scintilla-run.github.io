@@ -22,6 +22,11 @@ const runtimes = [
   "browser automation",
 ];
 
+function attribute(tag, name) {
+  const match = new RegExp(`\\b${name}\\s*=\\s*(?:"([^"]*)"|'([^']*)')`, "i").exec(tag);
+  return match?.[1] ?? match?.[2];
+}
+
 function verifyPage(document, label) {
   assert.match(document, /twelve runtimes/i, `${label} must advertise the shipped runtime count`);
   assert.doesNotMatch(document, /ten runtimes/i, `${label} contains the stale runtime count`);
@@ -29,22 +34,29 @@ function verifyPage(document, label) {
     assert.ok(document.includes(runtime), `${label} omits the ${runtime} runtime`);
   }
 
-  assert.match(
-    document,
-    /<link\s+rel=["']canonical["']\s+href=["']https:\/\/scintilla-run\.github\.io\/["']\s*\/?>/i,
+  const links = [...document.matchAll(/<link\b[^>]*>/gi)].map((match) => match[0]);
+  const canonical = links.find((tag) => attribute(tag, "rel")?.toLowerCase() === "canonical");
+  assert.equal(
+    canonical && attribute(canonical, "href"),
+    "https://scintilla-run.github.io/",
     `${label} must publish one canonical HTTPS URL`,
   );
-  assert.match(
-    document,
-    /<meta\s+name=["']referrer["']\s+content=["']no-referrer["']\s*\/?>/i,
+
+  const metas = [...document.matchAll(/<meta\b[^>]*>/gi)].map((match) => match[0]);
+  const referrer = metas.find((tag) => attribute(tag, "name")?.toLowerCase() === "referrer");
+  assert.equal(
+    referrer && attribute(referrer, "content"),
+    "no-referrer",
     `${label} must not leak navigation referrers`,
   );
+
   assert.doesNotMatch(document, /http:\/\//i, `${label} contains a cleartext remote URL`);
   assert.doesNotMatch(document, /<script\b/i, `${label} must remain JavaScript-free`);
 
-  const policy = /<meta\s+http-equiv=["']Content-Security-Policy["']\s+content=["']([^"']+)["']/i.exec(
-    document,
-  )?.[1];
+  const cspTag = metas.find(
+    (tag) => attribute(tag, "http-equiv")?.toLowerCase() === "content-security-policy",
+  );
+  const policy = cspTag && attribute(cspTag, "content");
   assert.ok(policy, `${label} has no in-document Content Security Policy`);
   for (const directive of [
     "default-src 'none'",
