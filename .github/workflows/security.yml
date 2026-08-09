@@ -1,0 +1,72 @@
+name: security
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  schedule:
+    - cron: "23 9 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: "1"
+  PUPPETEER_SKIP_DOWNLOAD: "true"
+
+jobs:
+  npm-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+        with:
+          persist-credentials: false
+          show-progress: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v6
+        with:
+          node-version: "22"
+          cache: npm
+      - name: Audit the committed dependency graph without running lifecycle scripts
+        run: npm audit --audit-level=high
+
+  secret-scan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+        with:
+          persist-credentials: false
+          show-progress: false
+      - name: Scan the tracked working tree and emit a redacted report
+        uses: docker://ghcr.io/gitleaks/gitleaks@sha256:c00b6bd0aeb3071cbcb79009cb16a60dd9e0a7c60e2be9ab65d25e6bc8abbb7f # v8.30.1
+        with:
+          args: >-
+            dir --redact --no-banner --exit-code 0
+            --report-format json --report-path gitleaks-report.json .
+      - name: Print only source locations and enforce zero findings
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+
+          report = Path("gitleaks-report.json")
+          findings = json.loads(report.read_text()) if report.exists() else []
+          for finding in findings:
+              print(
+                  "rule={rule} file={file} lines={start}-{end}".format(
+                      rule=finding.get("RuleID", "unknown"),
+                      file=finding.get("File", "unknown"),
+                      start=finding.get("StartLine", "?"),
+                      end=finding.get("EndLine", "?"),
+                  )
+              )
+          if findings:
+              raise SystemExit(f"gitleaks found {len(findings)} tracked-tree matches")
+          print("gitleaks found no tracked-tree matches")
+          PY
