@@ -6,7 +6,7 @@ import { fileURLToPath } from "node:url";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const sourcePath = join(root, "src/pages/index.astro");
-const builtPath = join(root, "dist/index.html");
+const builtPath = join(process.env.SCINTILLA_SITE_DIST ?? join(root, "dist"), "index.html");
 const runtimes = [
   "Node.js",
   "Python",
