@@ -21,26 +21,31 @@
   .tagline { font-size: 1.2rem; color: var(--muted); max-width: 44rem; }
   .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr)); gap: 1rem; margin: 3rem 0; }
   .card { background: var(--card); border: 1px solid var(--border); border-radius: 0.75rem; padding: 1.1rem 1.25rem; }
-  .card h3 { font-size: 1rem; margin-bottom: 0.35rem; }
+  .card h2 { font-size: 1rem; margin-bottom: 0.35rem; }
   .card p { font-size: 0.92rem; color: var(--muted); }
   .rule { height: 3px; width: 4rem; background: var(--accent); border-radius: 2px; margin: 1.5rem 0 0; }
   footer { margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid var(--border); color: var(--muted); font-size: 0.9rem; display: flex; gap: 1.5rem; flex-wrap: wrap; }
-  a { color: var(--accent); text-decoration: none; } a:hover { text-decoration: underline; }
+  a { color: var(--accent); text-decoration: underline; text-underline-offset: 0.15em; }
+  a:hover { text-decoration-thickness: 2px; }
+  a:focus-visible { outline: 3px solid var(--fg); outline-offset: 3px; }
+  .skip-link { position: absolute; left: -10000px; top: auto; }
+  .skip-link:focus-visible { left: 1rem; top: 1rem; z-index: 1; padding: 0.6rem 1rem; background: var(--card); border: 2px solid var(--fg); }
 </style>
 </head>
 <body>
-<main>
+<a class="skip-link" href="#main-content">Skip to content</a>
+<main id="main-content">
   <div class="latin">scintilla — a spark; the smallest possible amount</div>
   <h1>Scintilla</h1>
   <p class="tagline">A BEAM-powered lambda runtime: warm processes, twelve runtimes, durable workflows.</p>
   <div class="rule"></div>
   <div class="grid">
-<div class="card"><h3>Warm lambda invocation</h3><p>Reusable child processes answer invocations without cold starts, managed by BEAM supervision.</p></div>
-<div class="card"><h3>Twelve runtimes</h3><p>Node.js, Python, Ruby, Bash, Go, Dart, Erlang, Elixir, Java, Gleam, Rust, and browser automation.</p></div>
-<div class="card"><h3>Durable workflows</h3><p>Start runs, deliver signals, cancel, and replay step history over plain HTTP.</p></div>
-<div class="card"><h3>Browser functions</h3><p>Playwright and Puppeteer lambdas in a dedicated containerized browser runtime.</p></div>
-<div class="card"><h3>HTTP and NATS</h3><p>Invoke over REST or NATS subjects with queue groups and result publishing.</p></div>
-<div class="card"><h3>Fail-closed auth</h3><p>Invocation endpoints refuse to run without a configured shared secret.</p></div>
+<div class="card"><h2>Warm lambda invocation</h2><p>Reusable child processes answer invocations without cold starts, managed by BEAM supervision.</p></div>
+<div class="card"><h2>Twelve runtimes</h2><p>Node.js, Python, Ruby, Bash, Go, Dart, Erlang, Elixir, Java, Gleam, Rust, and browser automation.</p></div>
+<div class="card"><h2>Durable workflows</h2><p>Start runs, deliver signals, cancel, and replay step history over plain HTTP.</p></div>
+<div class="card"><h2>Browser functions</h2><p>Playwright and Puppeteer lambdas in a dedicated containerized browser runtime.</p></div>
+<div class="card"><h2>HTTP and NATS</h2><p>Invoke over REST or NATS subjects with queue groups and result publishing.</p></div>
+<div class="card"><h2>Fail-closed auth</h2><p>Invocation endpoints refuse to run without a configured shared secret.</p></div>
   </div>
   <footer>
     <a href="https://github.com/scintilla-run">GitHub org</a>
