@@ -52,6 +52,9 @@ function verifyPage(document, label) {
 
   assert.doesNotMatch(document, /http:\/\//i, `${label} contains a cleartext remote URL`);
   assert.doesNotMatch(document, /<script\b/i, `${label} must remain JavaScript-free`);
+  assert.match(document, /<a\b[^>]*class="skip-link"[^>]*href="#main-content"/, `${label} must provide keyboard skip navigation`);
+  assert.match(document, /<main\b[^>]*id="main-content"/, `${label} must provide the skip target`);
+  assert.doesNotMatch(document, /<h3\b/i, `${label} must not skip from H1 to H3 in feature cards`);
 
   const cspTag = metas.find(
     (tag) => attribute(tag, "http-equiv")?.toLowerCase() === "content-security-policy",
